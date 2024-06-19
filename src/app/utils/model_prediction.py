@@ -2,15 +2,29 @@ import pandas as pd
 from sklearn.preprocessing import normalize
 from scipy.sparse import csr_matrix
 
-def predict_movies(user_id, model, csr_data_normalized, data, movies, n=5):
-    try:
-        user_idx = data.columns.get_loc(user_id)
+def get_movie_recommendation(movie_name, model, data_final, movies, n=10):
+    movie_list = movies[movies['title'].str.contains(movie_name, case=False, na=False)]
+    
+    if len(movie_list) > 0:
+        movie_idx = movie_list.iloc[0]['movieId']
+        movie_idx = data_final[data_final['movieId'] == movie_idx].index[0]
 
-        distances, indices = model.kneighbors(csr_data_normalized[user_idx].reshape(1, -1), n_neighbors=n+1)
+        distances, indices = model.kneighbors(data_final.iloc[movie_idx].values.reshape(1, -1), n_neighbors=n+1)
 
-        recommended_movie_ids = [data.index[idx] for idx in indices.flatten()[1:]]
-        recommended_movies = movies[movies['movieId'].isin(recommended_movie_ids)]
+        rec_movie_indices = sorted(list(zip(indices.squeeze(), distances.squeeze())), key=lambda x: x[1])[1:]
 
-        return recommended_movies
-    except KeyError:
+        recommend = []
+        recommend_distances = []
+
+        for val in rec_movie_indices:
+            movie_idx = data_final.iloc[val[0]]['movieId']
+            idx = movies[movies['movieId'] == movie_idx].index
+            recommend.append(movies.iloc[idx]['title'].values[0])
+            recommend_distances.append(val[1])
+
+        df = pd.DataFrame({'Title': recommend, 'Distance': recommend_distances})
+        df.set_index('Distance', inplace=True)
+
+        return df
+    else:
         return None

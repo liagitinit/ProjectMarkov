@@ -4,8 +4,8 @@ services:
   web:
     build: .
     ports:
-      - "8000:8000"
+      - "8003:8000"  # Puerto expuesto en el contenedor
     volumes:
-      - ./src:/src
+      - ./src:/src   # Montar el directorio src al contenedor
     environment:
       - ENV_VAR=example
