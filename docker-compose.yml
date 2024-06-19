@@ -4,7 +4,7 @@ services:
   web:
     build: .
     ports:
-      - "8003:8000"  # Puerto expuesto en el contenedor
+      - "8005:8000"  # Puerto expuesto en el contenedor
     volumes:
       - ./src:/src   # Montar el directorio src al contenedor
     environment:

@@ -1,18 +1,21 @@
-# Usar una imagen base oficial de Python
 FROM python:3.8-slim
 
-# Establecer el directorio de trabajo
+# Establece el directorio de trabajo en /src
 WORKDIR /src
 
-# Copiar los archivos de requisitos e instalar las dependencias
+# Copia el archivo de requisitos y luego instala las dependencias
 COPY src/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar el código de la aplicación
+# Copia el código fuente al contenedor
 COPY src /src
 
-# Exponer el puerto en el que correrá la aplicación
+# Copia los archivos CSV al contenedor
+COPY src/data/movies.csv /src/data/movies.csv
+COPY src/data/ratings.csv /src/data/ratings.csv
+
+# Expone el puerto 8000
 EXPOSE 8000
 
-# Comando para correr la aplicación usando Uvicorn
+# Comando para ejecutar la aplicación
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
